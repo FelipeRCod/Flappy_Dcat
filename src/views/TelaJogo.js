@@ -292,13 +292,14 @@ export default function TelaJogo({ navigation, route }) {
     });
   };
 
-  const handlebackToStart = () => {
+  const handleVoltarMenuInicial = () => {
+    pararMusicasFundo();
     pontuacaoRef.current = 0;
     leitesColetadosRef.current = 0;
     setIsRunning(false);
     setIsGameOver(false);
     setEfeitoCoelho({ ativo: false, segundos: 0 });
-    sincronizarMusicaFundo(temaAtual, false, false);
+    navigation.navigate('TelaBoasVindas', { temaInicial: temaAtual });
   };
 
   const handleOnStartGame = () => {
@@ -681,9 +682,9 @@ export default function TelaJogo({ navigation, route }) {
 
                   <TouchableOpacity
                     style={[styles.botaoVoltarStart, styles.botaoFullPaisagem]}
-                    onPress={handlebackToStart}
+                    onPress={handleVoltarMenuInicial}
                   >
-                    <Text style={styles.botaoVoltarStartTexto}>TELA DE START</Text>
+                    <Text style={styles.botaoVoltarStartTexto}>VOLTAR AO MENU INICIAL</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -732,9 +733,9 @@ export default function TelaJogo({ navigation, route }) {
 
                   <TouchableOpacity
                     style={styles.botaoVoltarStart}
-                    onPress={handlebackToStart}
+                    onPress={handleVoltarMenuInicial}
                   >
-                    <Text style={styles.botaoVoltarStartTexto}>TELA DE START</Text>
+                    <Text style={styles.botaoVoltarStartTexto}>VOLTAR AO MENU INICIAL</Text>
                   </TouchableOpacity>
                 </View>
               </>
@@ -1077,13 +1078,16 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     borderRadius: 12,
     backgroundColor: 'rgba(15, 23, 42, 0.9)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.7)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   botaoVoltarStartTexto: {
     color: '#FFFFFF',
-    fontSize: 12.5,
+    fontSize: 12,
     fontWeight: '800',
+    textAlign: 'center',
   },
   modalFundoAbsoluto: {
     position: 'absolute',
