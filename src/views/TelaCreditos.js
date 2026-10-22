@@ -1,0 +1,294 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  ImageBackground,
+  SafeAreaView,
+} from 'react-native';
+import { Configuracoes, AssetsJogo } from '../models/Configuracoes';
+
+export default function TelaCreditos({ navigation, route }) {
+  const temaAtual = route?.params?.temaEscolhido || 'DIA';
+  const dadosTema = Configuracoes.TEMAS[temaAtual];
+  const imagemFundo = AssetsJogo.FUNDOS[temaAtual];
+
+  const [abaSprites, setAbaSprites] = useState('NORMAL');
+
+  const listaSprites =
+    abaSprites === 'NORMAL'
+      ? [
+          { nome: 'Gato_Normal_Asa_Cima.png', desc: 'Subindo (Tap)', img: AssetsJogo.GATO.NORMAL.ASA_CIMA },
+          { nome: 'Gato_Normal_Asa_Baixo.png', desc: 'Caindo (Gravidade)', img: AssetsJogo.GATO.NORMAL.ASA_BAIXO },
+          { nome: 'Gato_Normal_Leite.png', desc: 'Coletando Leite', img: AssetsJogo.GATO.NORMAL.LEITE },
+          { nome: 'Gato_Normal_Colisao.png', desc: 'Colisao / Game Over', img: AssetsJogo.GATO.NORMAL.COLISAO },
+        ]
+      : [
+          { nome: 'Gato_Efeito_Asa_Cima.png', desc: 'Subindo (Turbo 3x)', img: AssetsJogo.GATO.EFEITO.ASA_CIMA },
+          { nome: 'Gato_Efeito_Asa_Baixo.png', desc: 'Caindo (Turbo 3x)', img: AssetsJogo.GATO.EFEITO.ASA_BAIXO },
+          { nome: 'Gato_Efeito_Leite.png', desc: 'Coletando Leite (3x)', img: AssetsJogo.GATO.EFEITO.LEITE },
+          { nome: 'Gato_Efeito_Colisao.png', desc: 'Colisao (Com Efeito)', img: AssetsJogo.GATO.EFEITO.COLISAO },
+        ];
+
+  return (
+    <ImageBackground source={imagemFundo} style={styles.fundo} resizeMode="cover">
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.overlay}>
+          <View style={styles.header}>
+            <Text style={styles.titulo}>CREDITOS ACADEMICOS</Text>
+            <Text style={styles.subtitulo}>{Configuracoes.META.INSTITUICAO}</Text>
+          </View>
+
+          <ScrollView
+            style={styles.scrollArea}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={[styles.card, { backgroundColor: dadosTema.corCard }]}>
+              <Text style={[styles.labelSecao, { color: dadosTema.corSecundaria }]}>
+                DESENVOLVEDOR E AUTOR DO PROJETO
+              </Text>
+              <Text style={[styles.nomeDev, { color: dadosTema.corTexto }]}>
+                {Configuracoes.META.DESENVOLVEDOR}
+              </Text>
+
+              <View style={styles.infoGrid}>
+                <View style={styles.infoItem}>
+                  <Text style={[styles.infoTitulo, { color: dadosTema.corTexto }]}>Curso:</Text>
+                  <Text style={[styles.infoValor, { color: dadosTema.corTexto }]}>
+                    Desenvolvimento de Software Multiplataforma (DSM)
+                  </Text>
+                </View>
+
+                <View style={styles.infoItem}>
+                  <Text style={[styles.infoTitulo, { color: dadosTema.corTexto }]}>Instituicao:</Text>
+                  <Text style={[styles.infoValor, { color: dadosTema.corTexto }]}>
+                    FATEC - 2026
+                  </Text>
+                </View>
+
+                <View style={styles.infoItem}>
+                  <Text style={[styles.infoTitulo, { color: dadosTema.corTexto }]}>Arquitetura:</Text>
+                  <Text style={[styles.infoValor, { color: dadosTema.corTexto }]}>
+                    {Configuracoes.META.ARQUITETURA}
+                  </Text>
+                </View>
+
+                <View style={styles.infoItem}>
+                  <Text style={[styles.infoTitulo, { color: dadosTema.corTexto }]}>Plataforma:</Text>
+                  <Text style={[styles.infoValor, { color: dadosTema.corTexto }]}>
+                    React Native ({Configuracoes.META.SDK})
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={[styles.card, { backgroundColor: dadosTema.corCard }]}>
+              <Text style={[styles.cardTitulo, { color: dadosTema.corTexto }]}>
+                Maquina de Estados do Personagem (8 Sprites)
+              </Text>
+
+              <View style={styles.abasRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.abaBotao,
+                    abaSprites === 'NORMAL' && { backgroundColor: dadosTema.corPrimaria },
+                  ]}
+                  onPress={() => setAbaSprites('NORMAL')}
+                >
+                  <Text
+                    style={[
+                      styles.abaTexto,
+                      abaSprites === 'NORMAL' && { color: '#023047' },
+                    ]}
+                  >
+                    Estado Normal (4)
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.abaBotao,
+                    abaSprites === 'EFEITO' && { backgroundColor: dadosTema.corPrimaria },
+                  ]}
+                  onPress={() => setAbaSprites('EFEITO')}
+                >
+                  <Text
+                    style={[
+                      styles.abaTexto,
+                      abaSprites === 'EFEITO' && { color: '#023047' },
+                    ]}
+                  >
+                    Efeito Arco-Iris (4)
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.spritesGrid}>
+                {listaSprites.map((item) => (
+                  <View key={item.nome} style={styles.spriteBox}>
+                    <Image source={item.img} style={styles.spriteImg} resizeMode="contain" />
+                    <Text style={[styles.spriteDesc, { color: dadosTema.corTexto }]}>
+                      {item.desc}
+                    </Text>
+                    <Text style={styles.spriteArquivo}>{item.nome}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+
+          <TouchableOpacity
+            style={[styles.botaoVoltar, { backgroundColor: dadosTema.corPrimaria }]}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.botaoVoltarTexto}>VOLTAR AO MENU PRINCIPAL</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </ImageBackground>
+  );
+}
+
+const styles = StyleSheet.create({
+  fundo: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.48)',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  titulo: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#FFD166',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
+  },
+  subtitulo: {
+    fontSize: 13,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  scrollArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 12,
+  },
+  card: {
+    borderRadius: 16,
+    padding: 15,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  labelSecao: {
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  nomeDev: {
+    fontSize: 22,
+    fontWeight: '900',
+    marginTop: 2,
+    marginBottom: 10,
+  },
+  infoGrid: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(150, 150, 150, 0.3)',
+    paddingTop: 8,
+  },
+  infoItem: {
+    marginBottom: 6,
+  },
+  infoTitulo: {
+    fontSize: 12,
+    fontWeight: '800',
+    opacity: 0.75,
+  },
+  infoValor: {
+    fontSize: 13.5,
+    fontWeight: '700',
+  },
+  cardTitulo: {
+    fontSize: 15,
+    fontWeight: '900',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  abasRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderRadius: 10,
+    padding: 3,
+  },
+  abaBotao: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  abaTexto: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  spritesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  spriteBox: {
+    width: '48%',
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    borderRadius: 12,
+    padding: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  spriteImg: {
+    width: 85,
+    height: 52,
+    marginBottom: 4,
+  },
+  spriteDesc: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  spriteArquivo: {
+    fontSize: 9,
+    color: '#888',
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  botaoVoltar: {
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    marginTop: 6,
+  },
+  botaoVoltarTexto: {
+    color: '#023047',
+    fontWeight: '900',
+    fontSize: 14,
+  },
+});
