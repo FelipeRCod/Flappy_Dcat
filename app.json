@@ -6,6 +6,14 @@
     "orientation": "default",
     "userInterfaceStyle": "light",
     "sdkVersion": "57.0.0",
+    "androidStatusBar": {
+      "hidden": true,
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "visible": "sticky-immersive",
+      "backgroundColor": "#000000"
+    },
     "platforms": [
       "ios",
       "android",

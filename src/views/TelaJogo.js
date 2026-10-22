@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { GameEngine } from 'react-native-game-engine';
 import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import * as NavigationBar from 'expo-navigation-bar';
 import {
   Configuracoes,
   AssetsJogo,
@@ -24,6 +25,20 @@ import {
   calcularMultiplicadorEfeitos,
 } from '../models/Configuracoes';
 import { criarEntidadesIniciais, Physics } from '../controllers/MotorJogo';
+
+const ocultarBotoesSistema = () => {
+  try {
+    RNStatusBar.setHidden(true, 'fade');
+    if (Platform.OS === 'android') {
+      if (NavigationBar.NavigationBar && NavigationBar.NavigationBar.setHidden) {
+        NavigationBar.NavigationBar.setHidden(true);
+      }
+      if (NavigationBar.setVisibilityAsync) {
+        NavigationBar.setVisibilityAsync('hidden').catch(() => {});
+      }
+    }
+  } catch (e) {}
+};
 
 export default function TelaJogo({ navigation, route }) {
   const windowDims = useWindowDimensions();
@@ -287,6 +302,7 @@ export default function TelaJogo({ navigation, route }) {
   };
 
   const handleOnStartGame = () => {
+    ocultarBotoesSistema();
     pontuacaoRef.current = 0;
     leitesColetadosRef.current = 0;
     setPontuacao(0);
@@ -334,6 +350,7 @@ export default function TelaJogo({ navigation, route }) {
         handleOnGameOver();
         break;
       case 'pulo_gato':
+        ocultarBotoesSistema();
         tocarSomCurto(playerMiado, 0.18, false);
         sincronizarMusicaFundo(temaAtual, efeitoCoelho.ativo, false);
         break;
@@ -367,6 +384,7 @@ export default function TelaJogo({ navigation, route }) {
   };
 
   const aoMedirLayout = (e) => {
+    ocultarBotoesSistema();
     const { width, height } = e.nativeEvent.layout;
     if (
       width > 0 &&
