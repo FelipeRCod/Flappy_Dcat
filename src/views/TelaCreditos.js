@@ -7,7 +7,6 @@ import {
   ScrollView,
   Image,
   ImageBackground,
-  SafeAreaView,
   useWindowDimensions,
   Platform,
   StatusBar as RNStatusBar,
@@ -47,7 +46,7 @@ export default function TelaCreditos({ navigation, route }) {
 
   return (
     <ImageBackground source={imagemFundo} style={styles.fundo} resizeMode="cover">
-      <SafeAreaView style={styles.safeArea}>
+      <View style={styles.safeArea}>
         <View style={[styles.overlay, { paddingTop: paddingTopo }, isPaisagem && styles.overlayPaisagem]}>
           {isPaisagem ? (
             <View style={styles.headerPaisagemRow}>
@@ -181,7 +180,7 @@ export default function TelaCreditos({ navigation, route }) {
             </TouchableOpacity>
           )}
         </View>
-      </SafeAreaView>
+      </View>
     </ImageBackground>
   );
 }

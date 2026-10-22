@@ -7,7 +7,6 @@ import {
   TouchableWithoutFeedback,
   Image,
   ImageBackground,
-  SafeAreaView,
   useWindowDimensions,
   Platform,
   StatusBar as RNStatusBar,
@@ -502,7 +501,7 @@ export default function TelaJogo({ navigation, route }) {
       resizeMode="cover"
       onLayout={aoMedirLayout}
     >
-      <SafeAreaView style={styles.hudSafeArea} pointerEvents="box-none">
+      <View style={styles.hudSafeArea} pointerEvents="box-none">
         <View
           style={[
             styles.hudTopoRow,
@@ -553,7 +552,7 @@ export default function TelaJogo({ navigation, route }) {
             </Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
 
       {!isRunning && !isGameOver && (
         <View style={[styles.overlayCentral, isPaisagem && styles.overlayCentralPaisagem]}>

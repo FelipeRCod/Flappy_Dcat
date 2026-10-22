@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ImageBackground,
   Image,
-  SafeAreaView,
   ScrollView,
   useWindowDimensions,
   Platform,
@@ -306,7 +305,7 @@ export default function TelaBoasVindas({ navigation, route }) {
 
   return (
     <ImageBackground source={imagemFundo} style={styles.fundo} resizeMode="cover">
-      <SafeAreaView style={styles.safeArea}>
+      <View style={styles.safeArea}>
         <ScrollView
           style={styles.scrollArea}
           contentContainerStyle={[
@@ -349,7 +348,7 @@ export default function TelaBoasVindas({ navigation, route }) {
             </>
           )}
         </ScrollView>
-      </SafeAreaView>
+      </View>
 
       {modalAudioVisivel && (
         <View style={styles.modalFundoAbsoluto}>
