@@ -8,10 +8,16 @@ import {
   Image,
   ImageBackground,
   SafeAreaView,
+  useWindowDimensions,
+  Platform,
+  StatusBar as RNStatusBar,
 } from 'react-native';
 import { Configuracoes, AssetsJogo } from '../models/Configuracoes';
 
 export default function TelaCreditos({ navigation, route }) {
+  const { width, height } = useWindowDimensions();
+  const isPaisagem = width > height;
+
   const temaAtual = route?.params?.temaEscolhido || 'DIA';
   const dadosTema = Configuracoes.TEMAS[temaAtual];
   const imagemFundo = AssetsJogo.FUNDOS[temaAtual];
@@ -33,14 +39,36 @@ export default function TelaCreditos({ navigation, route }) {
           { nome: 'Gato_Efeito_Colisao.png', desc: 'Colisao (Com Efeito)', img: AssetsJogo.GATO.EFEITO.COLISAO },
         ];
 
+  const paddingTopo = isPaisagem
+    ? 6
+    : Platform.OS === 'android'
+    ? (RNStatusBar.currentHeight || 24) + 8
+    : 14;
+
   return (
     <ImageBackground source={imagemFundo} style={styles.fundo} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.overlay}>
-          <View style={styles.header}>
-            <Text style={styles.titulo}>CREDITOS ACADEMICOS</Text>
-            <Text style={styles.subtitulo}>{Configuracoes.META.INSTITUICAO}</Text>
-          </View>
+        <View style={[styles.overlay, { paddingTop: paddingTopo }, isPaisagem && styles.overlayPaisagem]}>
+          {isPaisagem ? (
+            <View style={styles.headerPaisagemRow}>
+              <View>
+                <Text style={styles.tituloPaisagem}>CREDITOS ACADEMICOS</Text>
+                <Text style={styles.subtituloPaisagem}>{Configuracoes.META.INSTITUICAO}</Text>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.botaoTopoPaisagem, { backgroundColor: dadosTema.corPrimaria }]}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={styles.botaoVoltarTexto}>VOLTAR AO MENU</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.header}>
+              <Text style={styles.titulo}>CREDITOS ACADEMICOS</Text>
+              <Text style={styles.subtitulo}>{Configuracoes.META.INSTITUICAO}</Text>
+            </View>
+          )}
 
           <ScrollView
             style={styles.scrollArea}
@@ -55,29 +83,29 @@ export default function TelaCreditos({ navigation, route }) {
                 {Configuracoes.META.DESENVOLVEDOR}
               </Text>
 
-              <View style={styles.infoGrid}>
-                <View style={styles.infoItem}>
+              <View style={[styles.infoGrid, isPaisagem && styles.infoGridPaisagem]}>
+                <View style={[styles.infoItem, isPaisagem && styles.infoItemPaisagem]}>
                   <Text style={[styles.infoTitulo, { color: dadosTema.corTexto }]}>Curso:</Text>
                   <Text style={[styles.infoValor, { color: dadosTema.corTexto }]}>
                     Desenvolvimento de Software Multiplataforma (DSM)
                   </Text>
                 </View>
 
-                <View style={styles.infoItem}>
+                <View style={[styles.infoItem, isPaisagem && styles.infoItemPaisagem]}>
                   <Text style={[styles.infoTitulo, { color: dadosTema.corTexto }]}>Instituicao:</Text>
                   <Text style={[styles.infoValor, { color: dadosTema.corTexto }]}>
                     FATEC - 2026
                   </Text>
                 </View>
 
-                <View style={styles.infoItem}>
+                <View style={[styles.infoItem, isPaisagem && styles.infoItemPaisagem]}>
                   <Text style={[styles.infoTitulo, { color: dadosTema.corTexto }]}>Arquitetura:</Text>
                   <Text style={[styles.infoValor, { color: dadosTema.corTexto }]}>
                     {Configuracoes.META.ARQUITETURA}
                   </Text>
                 </View>
 
-                <View style={styles.infoItem}>
+                <View style={[styles.infoItem, isPaisagem && styles.infoItemPaisagem]}>
                   <Text style={[styles.infoTitulo, { color: dadosTema.corTexto }]}>Plataforma:</Text>
                   <Text style={[styles.infoValor, { color: dadosTema.corTexto }]}>
                     React Native ({Configuracoes.META.SDK})
@@ -129,7 +157,10 @@ export default function TelaCreditos({ navigation, route }) {
 
               <View style={styles.spritesGrid}>
                 {listaSprites.map((item) => (
-                  <View key={item.nome} style={styles.spriteBox}>
+                  <View
+                    key={item.nome}
+                    style={[styles.spriteBox, isPaisagem && styles.spriteBoxPaisagem]}
+                  >
                     <Image source={item.img} style={styles.spriteImg} resizeMode="contain" />
                     <Text style={[styles.spriteDesc, { color: dadosTema.corTexto }]}>
                       {item.desc}
@@ -141,12 +172,14 @@ export default function TelaCreditos({ navigation, route }) {
             </View>
           </ScrollView>
 
-          <TouchableOpacity
-            style={[styles.botaoVoltar, { backgroundColor: dadosTema.corPrimaria }]}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.botaoVoltarTexto}>VOLTAR AO MENU PRINCIPAL</Text>
-          </TouchableOpacity>
+          {!isPaisagem && (
+            <TouchableOpacity
+              style={[styles.botaoVoltar, { backgroundColor: dadosTema.corPrimaria }]}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.botaoVoltarTexto}>VOLTAR AO MENU PRINCIPAL</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -164,14 +197,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.48)',
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingBottom: 12,
+  },
+  overlayPaisagem: {
+    paddingHorizontal: 14,
+    paddingBottom: 6,
   },
   header: {
     alignItems: 'center',
     marginBottom: 10,
   },
+  headerPaisagemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   titulo: {
     fontSize: 24,
+    fontWeight: '900',
+    color: '#FFD166',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
+  },
+  tituloPaisagem: {
+    fontSize: 19,
     fontWeight: '900',
     color: '#FFD166',
     textShadowColor: '#000',
@@ -183,16 +234,21 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
   },
+  subtituloPaisagem: {
+    fontSize: 11,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
   scrollArea: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 12,
+    paddingBottom: 10,
   },
   card: {
     borderRadius: 16,
-    padding: 15,
-    marginBottom: 12,
+    padding: 13,
+    marginBottom: 10,
     borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.5)',
   },
@@ -202,44 +258,52 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   nomeDev: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '900',
     marginTop: 2,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   infoGrid: {
     borderTopWidth: 1,
     borderTopColor: 'rgba(150, 150, 150, 0.3)',
     paddingTop: 8,
   },
+  infoGridPaisagem: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
   infoItem: {
-    marginBottom: 6,
+    marginBottom: 5,
+  },
+  infoItemPaisagem: {
+    width: '48%',
   },
   infoTitulo: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '800',
     opacity: 0.75,
   },
   infoValor: {
-    fontSize: 13.5,
+    fontSize: 12.5,
     fontWeight: '700',
   },
   cardTitulo: {
-    fontSize: 15,
+    fontSize: 14.5,
     fontWeight: '900',
-    marginBottom: 10,
+    marginBottom: 8,
     textAlign: 'center',
   },
   abasRow: {
     flexDirection: 'row',
-    marginBottom: 12,
+    marginBottom: 10,
     backgroundColor: 'rgba(0,0,0,0.25)',
     borderRadius: 10,
     padding: 3,
   },
   abaBotao: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 8,
     alignItems: 'center',
   },
@@ -261,34 +325,44 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     alignItems: 'center',
   },
+  spriteBoxPaisagem: {
+    width: '23.5%',
+  },
   spriteImg: {
-    width: 85,
-    height: 52,
+    width: 78,
+    height: 46,
     marginBottom: 4,
   },
   spriteDesc: {
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '800',
     textAlign: 'center',
   },
   spriteArquivo: {
-    fontSize: 9,
+    fontSize: 8.5,
     color: '#888',
     marginTop: 2,
     textAlign: 'center',
   },
   botaoVoltar: {
     width: '100%',
-    paddingVertical: 14,
+    paddingVertical: 13,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#FFFFFF',
     marginTop: 6,
   },
+  botaoTopoPaisagem: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
   botaoVoltarTexto: {
     color: '#023047',
     fontWeight: '900',
-    fontSize: 14,
+    fontSize: 12.5,
   },
 });

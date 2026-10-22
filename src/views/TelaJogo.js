@@ -8,8 +8,6 @@ import {
   Image,
   ImageBackground,
   SafeAreaView,
-  ScrollView,
-  Modal,
   useWindowDimensions,
   Platform,
   StatusBar as RNStatusBar,
@@ -396,11 +394,23 @@ export default function TelaJogo({ navigation, route }) {
     const niveis = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
     return (
-      <View style={styles.blocoAudio}>
-        <View style={styles.cabecalhoBlocoAudio}>
-          <View style={{ flex: 1 }}>
+      <View
+        style={[
+          styles.blocoAudio,
+          isPaisagem && styles.blocoAudioPaisagem,
+        ]}
+      >
+        <View
+          style={[
+            styles.cabecalhoBlocoAudio,
+            isPaisagem && styles.cabecalhoBlocoAudioPaisagem,
+          ]}
+        >
+          <View style={styles.infoCanalAudio}>
             <Text style={styles.tituloBlocoAudio}>{titulo}</Text>
-            <Text style={styles.subtituloBlocoAudio}>{subtitulo}</Text>
+            {!isPaisagem && (
+              <Text style={styles.subtituloBlocoAudio}>{subtitulo}</Text>
+            )}
           </View>
 
           <TouchableOpacity
@@ -416,7 +426,12 @@ export default function TelaJogo({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.controlesVolumeRow}>
+        <View
+          style={[
+            styles.controlesVolumeRow,
+            isPaisagem && styles.controlesVolumeRowPaisagem,
+          ]}
+        >
           <TouchableOpacity
             style={styles.botaoAjusteVolume}
             onPress={() => alterarVolumeCanal(chaveVolume, chaveMudo, volume - 10)}
@@ -456,7 +471,7 @@ export default function TelaJogo({ navigation, route }) {
   const imagemFundo = AssetsJogo.FUNDOS[temaAtual];
   const dadosTema = Configuracoes.TEMAS[temaAtual];
   const paddingTopoSeguro = isPaisagem
-    ? 8
+    ? 6
     : Platform.OS === 'android'
     ? (RNStatusBar.currentHeight || 24) + 10
     : 42;
@@ -522,7 +537,7 @@ export default function TelaJogo({ navigation, route }) {
       </SafeAreaView>
 
       {!isRunning && !isGameOver && (
-        <View style={styles.overlayCentral}>
+        <View style={[styles.overlayCentral, isPaisagem && styles.overlayCentralPaisagem]}>
           <View
             style={[
               styles.startCard,
@@ -530,49 +545,80 @@ export default function TelaJogo({ navigation, route }) {
               { backgroundColor: dadosTema.corCard },
             ]}
           >
-            <Text style={[styles.logoTexto, isPaisagem && styles.logoTextoPaisagem]}>
-              FLAPPY DCAT
-            </Text>
-            <Text style={[styles.subtituloStart, { color: dadosTema.corTexto }]}>
-              {dadosTema.subtitulo}
-            </Text>
+            {isPaisagem ? (
+              <View style={styles.cardPaisagemRow}>
+                <View style={styles.cardPaisagemColEsquerda}>
+                  <Text style={styles.logoTextoPaisagem}>FLAPPY DCAT</Text>
+                  <Text style={[styles.subtituloStartPaisagem, { color: dadosTema.corTexto }]}>
+                    {dadosTema.subtitulo}
+                  </Text>
+                  <Image
+                    source={
+                      temaAtual === 'DIA'
+                        ? AssetsJogo.GATO.NORMAL.ASA_CIMA
+                        : AssetsJogo.GATO.EFEITO.ASA_CIMA
+                    }
+                    style={styles.gatoStartPreviewPaisagem}
+                    resizeMode="contain"
+                  />
+                </View>
 
-            <Image
-              source={
-                temaAtual === 'DIA'
-                  ? AssetsJogo.GATO.NORMAL.ASA_CIMA
-                  : AssetsJogo.GATO.EFEITO.ASA_CIMA
-              }
-              style={[
-                styles.gatoStartPreview,
-                isPaisagem && styles.gatoStartPreviewPaisagem,
-              ]}
-              resizeMode="contain"
-            />
-
-            <TouchableWithoutFeedback onPress={handleOnStartGame}>
-              <View
-                style={[
-                  styles.playButton,
-                  isPaisagem && styles.playButtonPaisagem,
-                  { backgroundColor: dadosTema.corPrimaria },
-                ]}
-              >
-                <Text style={styles.playButtonText}>PLAY</Text>
+                <View style={styles.cardPaisagemColDireita}>
+                  <TouchableWithoutFeedback onPress={handleOnStartGame}>
+                    <View
+                      style={[
+                        styles.playButton,
+                        styles.playButtonPaisagem,
+                        { backgroundColor: dadosTema.corPrimaria },
+                      ]}
+                    >
+                      <Text style={styles.playButtonText}>PLAY</Text>
+                    </View>
+                  </TouchableWithoutFeedback>
+                  <Text style={[styles.dicaStartPaisagem, { color: dadosTema.corTexto }]}>
+                    Toque na tela para bater as asas e desviar das maos
+                  </Text>
+                </View>
               </View>
-            </TouchableWithoutFeedback>
+            ) : (
+              <>
+                <Text style={styles.logoTexto}>FLAPPY DCAT</Text>
+                <Text style={[styles.subtituloStart, { color: dadosTema.corTexto }]}>
+                  {dadosTema.subtitulo}
+                </Text>
 
-            {!isPaisagem && (
-              <Text style={[styles.dicaStart, { color: dadosTema.corTexto }]}>
-                Toque na tela para bater as asas e desviar das maos
-              </Text>
+                <Image
+                  source={
+                    temaAtual === 'DIA'
+                      ? AssetsJogo.GATO.NORMAL.ASA_CIMA
+                      : AssetsJogo.GATO.EFEITO.ASA_CIMA
+                  }
+                  style={styles.gatoStartPreview}
+                  resizeMode="contain"
+                />
+
+                <TouchableWithoutFeedback onPress={handleOnStartGame}>
+                  <View
+                    style={[
+                      styles.playButton,
+                      { backgroundColor: dadosTema.corPrimaria },
+                    ]}
+                  >
+                    <Text style={styles.playButtonText}>PLAY</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+
+                <Text style={[styles.dicaStart, { color: dadosTema.corTexto }]}>
+                  Toque na tela para bater as asas e desviar das maos
+                </Text>
+              </>
             )}
           </View>
         </View>
       )}
 
       {!isRunning && isGameOver && (
-        <View style={styles.overlayCentral}>
+        <View style={[styles.overlayCentral, isPaisagem && styles.overlayCentralPaisagem]}>
           <View
             style={[
               styles.gameOverCard,
@@ -580,62 +626,101 @@ export default function TelaJogo({ navigation, route }) {
               { backgroundColor: dadosTema.corCard, borderColor: '#E63946' },
             ]}
           >
-            <Text style={[styles.gameOverLogo, isPaisagem && styles.logoTextoPaisagem]}>
-              GAME OVER
-            </Text>
+            {isPaisagem ? (
+              <View style={styles.cardPaisagemRow}>
+                <View style={styles.cardPaisagemColEsquerda}>
+                  <Text style={styles.gameOverLogoPaisagem}>GAME OVER</Text>
+                  <View style={[styles.placarFinalRow, styles.placarFinalRowPaisagem]}>
+                    <View style={styles.placarFinalItem}>
+                      <Text style={styles.placarFinalNumero}>{pontuacao}</Text>
+                      <Text style={[styles.placarFinalLabel, { color: dadosTema.corTexto }]}>
+                        PONTOS
+                      </Text>
+                    </View>
+                    <View style={styles.divisorVertical} />
+                    <View style={styles.placarFinalItem}>
+                      <Text style={styles.placarFinalNumero}>
+                        {Math.max(recorde, pontuacao)}
+                      </Text>
+                      <Text style={[styles.placarFinalLabel, { color: dadosTema.corTexto }]}>
+                        RECORDE
+                      </Text>
+                    </View>
+                  </View>
+                </View>
 
-            {!isPaisagem && (
-              <Image
-                source={
-                  efeitoCoelho.ativo
-                    ? AssetsJogo.GATO.EFEITO.COLISAO
-                    : AssetsJogo.GATO.NORMAL.COLISAO
-                }
-                style={styles.gatoColisaoImg}
-                resizeMode="contain"
-              />
+                <View style={styles.cardPaisagemColDireita}>
+                  <TouchableOpacity
+                    style={[
+                      styles.playButton,
+                      styles.botaoFullPaisagem,
+                      { backgroundColor: dadosTema.corPrimaria },
+                    ]}
+                    onPress={handleOnStartGame}
+                  >
+                    <Text style={styles.playButtonTextPaisagem}>JOGAR NOVAMENTE</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.botaoVoltarStart, styles.botaoFullPaisagem]}
+                    onPress={handlebackToStart}
+                  >
+                    <Text style={styles.botaoVoltarStartTexto}>TELA DE START</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <>
+                <Text style={styles.gameOverLogo}>GAME OVER</Text>
+
+                <Image
+                  source={
+                    efeitoCoelho.ativo
+                      ? AssetsJogo.GATO.EFEITO.COLISAO
+                      : AssetsJogo.GATO.NORMAL.COLISAO
+                  }
+                  style={styles.gatoColisaoImg}
+                  resizeMode="contain"
+                />
+
+                <View style={styles.placarFinalRow}>
+                  <View style={styles.placarFinalItem}>
+                    <Text style={styles.placarFinalNumero}>{pontuacao}</Text>
+                    <Text style={[styles.placarFinalLabel, { color: dadosTema.corTexto }]}>
+                      PONTOS
+                    </Text>
+                  </View>
+                  <View style={styles.divisorVertical} />
+                  <View style={styles.placarFinalItem}>
+                    <Text style={styles.placarFinalNumero}>
+                      {Math.max(recorde, pontuacao)}
+                    </Text>
+                    <Text style={[styles.placarFinalLabel, { color: dadosTema.corTexto }]}>
+                      RECORDE
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.botoesColRetrato}>
+                  <TouchableOpacity
+                    style={[
+                      styles.playButton,
+                      { width: '100%', backgroundColor: dadosTema.corPrimaria },
+                    ]}
+                    onPress={handleOnStartGame}
+                  >
+                    <Text style={styles.playButtonText}>JOGAR NOVAMENTE</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.botaoVoltarStart}
+                    onPress={handlebackToStart}
+                  >
+                    <Text style={styles.botaoVoltarStartTexto}>TELA DE START</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
             )}
-
-            <View style={styles.placarFinalRow}>
-              <View style={styles.placarFinalItem}>
-                <Text style={styles.placarFinalNumero}>{pontuacao}</Text>
-                <Text style={[styles.placarFinalLabel, { color: dadosTema.corTexto }]}>
-                  PONTOS
-                </Text>
-              </View>
-              <View style={styles.divisorVertical} />
-              <View style={styles.placarFinalItem}>
-                <Text style={styles.placarFinalNumero}>
-                  {Math.max(recorde, pontuacao)}
-                </Text>
-                <Text style={[styles.placarFinalLabel, { color: dadosTema.corTexto }]}>
-                  RECORDE
-                </Text>
-              </View>
-            </View>
-
-            <View style={isPaisagem ? styles.botoesRowPaisagem : styles.botoesColRetrato}>
-              <TouchableOpacity
-                style={[
-                  styles.playButton,
-                  isPaisagem ? styles.botaoMetadePaisagem : { width: '100%' },
-                  { backgroundColor: dadosTema.corPrimaria },
-                ]}
-                onPress={handleOnStartGame}
-              >
-                <Text style={styles.playButtonText}>JOGAR NOVAMENTE</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.botaoVoltarStart,
-                  isPaisagem && styles.botaoMetadePaisagem,
-                ]}
-                onPress={handlebackToStart}
-              >
-                <Text style={styles.botaoVoltarStartTexto}>TELA DE START</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       )}
@@ -657,13 +742,8 @@ export default function TelaJogo({ navigation, route }) {
         />
       )}
 
-      <Modal
-        visible={modalAudioVisivel}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={fecharModalAudio}
-      >
-        <View style={styles.modalFundo}>
+      {modalAudioVisivel && (
+        <View style={styles.modalFundoAbsoluto}>
           <View style={[styles.modalCard, isPaisagem && styles.modalCardPaisagem]}>
             <View style={styles.modalHeaderRow}>
               <Text style={styles.modalTitulo}>CONFIGURACAO DE AUDIO</Text>
@@ -675,34 +755,33 @@ export default function TelaJogo({ navigation, route }) {
               </TouchableOpacity>
             </View>
 
-            <ScrollView
-              style={styles.modalScrollArea}
-              showsVerticalScrollIndicator={false}
-            >
-              {renderizarLinhaControleAudio(
-                'GERAL',
-                'Controla ou muta todos os audios do jogo',
-                'volumeGeral',
-                'mudoGeral'
-              )}
+            {renderizarLinhaControleAudio(
+              'GERAL',
+              'Controla ou muta todos os audios do jogo',
+              'volumeGeral',
+              'mudoGeral'
+            )}
 
-              {renderizarLinhaControleAudio(
-                'MUSICAS',
-                'Controla ou muta apenas a trilha sonora',
-                'volumeMusica',
-                'mudoMusica'
-              )}
+            {renderizarLinhaControleAudio(
+              'MUSICAS',
+              'Controla ou muta apenas a trilha sonora',
+              'volumeMusica',
+              'mudoMusica'
+            )}
 
-              {renderizarLinhaControleAudio(
-                'EFEITOS',
-                'Controla ou muta apenas vozes e miado',
-                'volumeEfeitos',
-                'mudoEfeitos'
-              )}
-            </ScrollView>
+            {renderizarLinhaControleAudio(
+              'EFEITOS',
+              'Controla ou muta apenas vozes e miado',
+              'volumeEfeitos',
+              'mudoEfeitos'
+            )}
 
             <TouchableOpacity
-              style={[styles.botaoFecharModal, { backgroundColor: dadosTema.corPrimaria }]}
+              style={[
+                styles.botaoFecharModal,
+                isPaisagem && styles.botaoFecharModalPaisagem,
+                { backgroundColor: dadosTema.corPrimaria },
+              ]}
               onPress={fecharModalAudio}
             >
               <Text style={styles.botaoFecharModalTexto}>
@@ -711,7 +790,7 @@ export default function TelaJogo({ navigation, route }) {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      )}
     </ImageBackground>
   );
 }
@@ -750,7 +829,7 @@ const styles = StyleSheet.create({
   botaoHud: {
     backgroundColor: 'rgba(15, 23, 42, 0.85)',
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.5)',
@@ -770,8 +849,8 @@ const styles = StyleSheet.create({
     borderColor: '#FFD166',
   },
   placarBoxPaisagem: {
-    paddingHorizontal: 14,
-    paddingVertical: 3,
+    paddingHorizontal: 12,
+    paddingVertical: 2,
   },
   placarBoxEfeito: {
     backgroundColor: 'rgba(123, 44, 191, 0.92)',
@@ -783,11 +862,11 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   placarValorPaisagem: {
-    fontSize: 18,
+    fontSize: 16,
   },
   placarLabel: {
     color: '#FFD166',
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '900',
   },
   overlayCentral: {
@@ -796,6 +875,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
     zIndex: 30,
+  },
+  overlayCentralPaisagem: {
+    paddingTop: 34,
   },
   startCard: {
     width: '100%',
@@ -807,9 +889,24 @@ const styles = StyleSheet.create({
     borderColor: '#FFD166',
   },
   cardPaisagem: {
-    maxWidth: 440,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    maxWidth: 520,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+  },
+  cardPaisagemRow: {
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardPaisagemColEsquerda: {
+    width: '48%',
+    alignItems: 'center',
+  },
+  cardPaisagemColDireita: {
+    width: '48%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logoTexto: {
     fontSize: 32,
@@ -821,7 +918,13 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   logoTextoPaisagem: {
-    fontSize: 24,
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#FFB703',
+    letterSpacing: 1.2,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
   },
   subtituloStart: {
     fontSize: 13,
@@ -829,15 +932,20 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 10,
   },
+  subtituloStartPaisagem: {
+    fontSize: 11,
+    fontWeight: '700',
+    marginTop: 2,
+    marginBottom: 4,
+  },
   gatoStartPreview: {
     width: 115,
     height: 68,
     marginBottom: 12,
   },
   gatoStartPreviewPaisagem: {
-    width: 90,
-    height: 52,
-    marginBottom: 8,
+    width: 82,
+    height: 48,
   },
   playButton: {
     marginTop: 6,
@@ -850,8 +958,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   playButtonPaisagem: {
-    paddingVertical: 10,
-    paddingHorizontal: 28,
+    width: '100%',
+    paddingVertical: 11,
+    paddingHorizontal: 16,
+    marginTop: 0,
   },
   playButtonText: {
     color: '#023047',
@@ -859,11 +969,23 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1,
   },
+  playButtonTextPaisagem: {
+    color: '#023047',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
   dicaStart: {
     fontSize: 12,
     fontWeight: '700',
     textAlign: 'center',
     marginTop: 12,
+  },
+  dicaStartPaisagem: {
+    fontSize: 10.5,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: 8,
   },
   gameOverCard: {
     width: '100%',
@@ -880,6 +1002,13 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     marginBottom: 8,
   },
+  gameOverLogoPaisagem: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#E63946',
+    letterSpacing: 1.2,
+    marginBottom: 6,
+  },
   gatoColisaoImg: {
     width: 120,
     height: 70,
@@ -893,6 +1022,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginBottom: 12,
     justifyContent: 'space-around',
+  },
+  placarFinalRowPaisagem: {
+    marginBottom: 0,
+    paddingVertical: 8,
   },
   placarFinalItem: {
     alignItems: 'center',
@@ -914,18 +1047,11 @@ const styles = StyleSheet.create({
   botoesColRetrato: {
     width: '100%',
   },
-  botoesRowPaisagem: {
-    flexDirection: 'row',
+  botaoFullPaisagem: {
     width: '100%',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  botaoMetadePaisagem: {
-    flex: 1,
-    marginHorizontal: 4,
-    marginTop: 0,
-    paddingVertical: 11,
+    paddingVertical: 9,
     paddingHorizontal: 10,
+    marginTop: 4,
   },
   botaoVoltarStart: {
     marginTop: 10,
@@ -938,30 +1064,33 @@ const styles = StyleSheet.create({
   },
   botaoVoltarStartTexto: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '800',
   },
-  modalFundo: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+  modalFundoAbsoluto: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.78)',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    zIndex: 200,
   },
   modalCard: {
     width: '100%',
     maxWidth: 380,
-    maxHeight: '90%',
     backgroundColor: '#0F172A',
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 18,
+    padding: 14,
     borderWidth: 2.5,
     borderColor: '#FFD166',
   },
   modalCardPaisagem: {
-    maxWidth: 480,
-    maxHeight: '94%',
+    maxWidth: 620,
     paddingVertical: 10,
     paddingHorizontal: 14,
   },
@@ -969,7 +1098,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   modalTitulo: {
     color: '#FFD166',
@@ -981,7 +1110,7 @@ const styles = StyleSheet.create({
   botaoFecharTopo: {
     backgroundColor: '#E63946',
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 5,
     borderRadius: 8,
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
@@ -992,26 +1121,39 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '900',
   },
-  modalScrollArea: {
-    flexGrow: 0,
-  },
   blocoAudio: {
     backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 8,
-    marginBottom: 8,
+    marginBottom: 7,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.14)',
+  },
+  blocoAudioPaisagem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginBottom: 6,
   },
   cabecalhoBlocoAudio: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
+  },
+  cabecalhoBlocoAudioPaisagem: {
+    width: 175,
+    marginBottom: 0,
+    marginRight: 10,
+  },
+  infoCanalAudio: {
+    flex: 1,
   },
   tituloBlocoAudio: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '900',
   },
   subtituloBlocoAudio: {
@@ -1020,10 +1162,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   botaoMudo: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    minWidth: 74,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 7,
+    minWidth: 68,
     alignItems: 'center',
   },
   botaoMudoAtivo: {
@@ -1034,7 +1176,7 @@ const styles = StyleSheet.create({
   },
   botaoMudoTexto: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '900',
   },
   controlesVolumeRow: {
@@ -1042,17 +1184,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  controlesVolumeRowPaisagem: {
+    flex: 1,
+  },
   botaoAjusteVolume: {
-    width: 32,
-    height: 30,
-    borderRadius: 8,
+    width: 30,
+    height: 28,
+    borderRadius: 7,
     backgroundColor: 'rgba(255, 255, 255, 0.16)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   botaoAjusteVolumeTexto: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '900',
   },
   barraSegmentosContainer: {
@@ -1060,14 +1205,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 8,
-    height: 20,
+    height: 18,
     alignItems: 'center',
   },
   segmentoVolume: {
     flex: 1,
-    height: 16,
+    height: 14,
     marginHorizontal: 2,
-    borderRadius: 4,
+    borderRadius: 3,
   },
   segmentoVolumeAtivo: {
     backgroundColor: '#FFB703',
@@ -1076,16 +1221,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.18)',
   },
   botaoFecharModal: {
-    marginTop: 4,
-    paddingVertical: 12,
-    borderRadius: 12,
+    marginTop: 2,
+    paddingVertical: 10,
+    borderRadius: 10,
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
   },
+  botaoFecharModalPaisagem: {
+    paddingVertical: 7,
+  },
   botaoFecharModalTexto: {
     color: '#023047',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '900',
     letterSpacing: 0.8,
   },

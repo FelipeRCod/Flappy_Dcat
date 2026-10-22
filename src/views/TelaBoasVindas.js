@@ -8,7 +8,6 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
-  Modal,
   useWindowDimensions,
   Platform,
   StatusBar as RNStatusBar,
@@ -82,11 +81,23 @@ export default function TelaBoasVindas({ navigation, route }) {
     const niveis = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
     return (
-      <View style={styles.blocoAudio}>
-        <View style={styles.cabecalhoBlocoAudio}>
-          <View style={{ flex: 1 }}>
+      <View
+        style={[
+          styles.blocoAudio,
+          isPaisagem && styles.blocoAudioPaisagem,
+        ]}
+      >
+        <View
+          style={[
+            styles.cabecalhoBlocoAudio,
+            isPaisagem && styles.cabecalhoBlocoAudioPaisagem,
+          ]}
+        >
+          <View style={styles.infoCanalAudio}>
             <Text style={styles.tituloBlocoAudio}>{titulo}</Text>
-            <Text style={styles.subtituloBlocoAudio}>{subtitulo}</Text>
+            {!isPaisagem && (
+              <Text style={styles.subtituloBlocoAudio}>{subtitulo}</Text>
+            )}
           </View>
 
           <TouchableOpacity
@@ -102,7 +113,12 @@ export default function TelaBoasVindas({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.controlesVolumeRow}>
+        <View
+          style={[
+            styles.controlesVolumeRow,
+            isPaisagem && styles.controlesVolumeRowPaisagem,
+          ]}
+        >
           <TouchableOpacity
             style={styles.botaoAjusteVolume}
             onPress={() => alterarVolumeCanal(chaveVolume, chaveMudo, volume - 10)}
@@ -140,10 +156,153 @@ export default function TelaBoasVindas({ navigation, route }) {
   };
 
   const paddingTopo = isPaisagem
-    ? 10
+    ? 6
     : Platform.OS === 'android'
-    ? (RNStatusBar.currentHeight || 24) + 12
-    : 20;
+    ? (RNStatusBar.currentHeight || 24) + 10
+    : 18;
+
+  const renderizarCardPreview = () => (
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={() => setEfeitoPreview((prev) => !prev)}
+      style={[
+        styles.previewCard,
+        isPaisagem && styles.previewCardPaisagem,
+        {
+          backgroundColor: dadosTema.corCard,
+          borderColor: dadosTema.corPrimaria,
+        },
+      ]}
+    >
+      <View style={[styles.gatoPreviewBox, isPaisagem && styles.gatoPreviewBoxPaisagem]}>
+        <Gato
+          PosicaoAbsoluta={false}
+          escala={isPaisagem ? 0.95 : 1.25}
+          efeitoAtivo={efeitoPreview}
+          estado={
+            asaCimaPreview
+              ? Configuracoes.ESTADOS_GATO.ASA_CIMA
+              : Configuracoes.ESTADOS_GATO.ASA_BAIXO
+          }
+        />
+      </View>
+      <Text style={[styles.dicaPreview, { color: dadosTema.corTexto }]}>
+        {efeitoPreview
+          ? 'Modo Leite de Coelho (3x) - Toque para alternar'
+          : 'Toque no gatinho para ver o Turbo Arco-Iris'}
+      </Text>
+
+      <View style={styles.itensResumoRow}>
+        <View style={styles.itemBadge}>
+          <Image
+            source={AssetsJogo.ITENS.LEITE_URSO}
+            style={styles.iconeLeite}
+            resizeMode="contain"
+          />
+          <Text style={[styles.itemBadgeTexto, { color: dadosTema.corTexto }]}>
+            Leite de Urso (+1 pt)
+          </Text>
+        </View>
+        <View style={styles.itemBadge}>
+          <Image
+            source={AssetsJogo.ITENS.LEITE_COELHO}
+            style={styles.iconeLeite}
+            resizeMode="contain"
+          />
+          <Text style={[styles.itemBadgeTexto, { color: dadosTema.corTexto }]}>
+            Leite de Coelho (3x)
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderizarControlesMenu = () => (
+    <View style={styles.blocoDireitoMenu}>
+      <View style={styles.seletorTemaContainer}>
+        <Text style={styles.seletorLabel}>ESCOLHA O TEMA DO CENARIO:</Text>
+        <View style={styles.botoesTemaRow}>
+          <TouchableOpacity
+            style={[
+              styles.botaoTema,
+              isPaisagem && styles.botaoTemaPaisagem,
+              temaAtual === 'DIA' && styles.botaoTemaAtivoDia,
+            ]}
+            onPress={() => alternarTema('DIA')}
+          >
+            <Text
+              style={[
+                styles.botaoTemaTexto,
+                temaAtual === 'DIA' && styles.botaoTemaTextoAtivo,
+              ]}
+            >
+              TEMA DIA
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.botaoTema,
+              isPaisagem && styles.botaoTemaPaisagem,
+              temaAtual === 'NOITE' && styles.botaoTemaAtivoNoite,
+            ]}
+            onPress={() => alternarTema('NOITE')}
+          >
+            <Text
+              style={[
+                styles.botaoTemaTexto,
+                temaAtual === 'NOITE' && styles.botaoTemaTextoAtivoNoite,
+              ]}
+            >
+              TEMA NOITE
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.menuBotoes}>
+        <TouchableOpacity
+          style={[
+            styles.botaoPrincipal,
+            isPaisagem && styles.botaoPrincipalPaisagem,
+            { backgroundColor: dadosTema.corPrimaria },
+          ]}
+          onPress={() => navigation.navigate('TelaJogo', { temaEscolhido: temaAtual })}
+        >
+          <Text style={styles.botaoPrincipalTexto}>JOGAR AGORA</Text>
+        </TouchableOpacity>
+
+        <View style={styles.botoesSecundariosRow}>
+          <TouchableOpacity
+            style={[styles.botaoSecundario, isPaisagem && styles.botaoSecundarioPaisagem]}
+            onPress={() =>
+              navigation.navigate('TelaInstrucoes', { temaEscolhido: temaAtual })
+            }
+          >
+            <Text style={styles.botaoSecundarioTexto}>INSTRUCOES</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.botaoSecundario, isPaisagem && styles.botaoSecundarioPaisagem]}
+            onPress={() => setModalAudioVisivel(true)}
+          >
+            <Text style={styles.botaoSecundarioTexto}>
+              {cfgAudio.mudoGeral ? 'AUDIO: OFF' : 'AUDIO'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.botaoSecundario, isPaisagem && styles.botaoSecundarioPaisagem]}
+            onPress={() =>
+              navigation.navigate('TelaCreditos', { temaEscolhido: temaAtual })
+            }
+          >
+            <Text style={styles.botaoSecundarioTexto}>CREDITOS</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
 
   return (
     <ImageBackground source={imagemFundo} style={styles.fundo} resizeMode="cover">
@@ -157,160 +316,43 @@ export default function TelaBoasVindas({ navigation, route }) {
           ]}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.badgeTopo}>
-            <Text style={styles.badgeTexto}>{Configuracoes.META.INSTITUICAO}</Text>
-          </View>
-
-          <View style={styles.headerContainer}>
-            <Text style={[styles.tituloSombra, isPaisagem && styles.tituloPaisagem]}>
-              FLAPPY DCAT
-            </Text>
-            <Text style={[styles.titulo, isPaisagem && styles.tituloPaisagem]}>
-              FLAPPY DCAT
-            </Text>
-            <Text style={styles.subtitulo}>{dadosTema.subtitulo}</Text>
-          </View>
-
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => setEfeitoPreview((prev) => !prev)}
-            style={[
-              styles.previewCard,
-              isPaisagem && styles.previewCardPaisagem,
-              {
-                backgroundColor: dadosTema.corCard,
-                borderColor: dadosTema.corPrimaria,
-              },
-            ]}
-          >
-            <View style={[styles.gatoPreviewBox, isPaisagem && styles.gatoPreviewBoxPaisagem]}>
-              <Gato
-                PosicaoAbsoluta={false}
-                escala={isPaisagem ? 1.05 : 1.25}
-                efeitoAtivo={efeitoPreview}
-                estado={
-                  asaCimaPreview
-                    ? Configuracoes.ESTADOS_GATO.ASA_CIMA
-                    : Configuracoes.ESTADOS_GATO.ASA_BAIXO
-                }
-              />
-            </View>
-            <Text style={[styles.dicaPreview, { color: dadosTema.corTexto }]}>
-              {efeitoPreview
-                ? 'Modo Leite de Coelho (3x Pontos) - Toque para alternar'
-                : 'Estado Normal - Toque no gatinho para ver o Turbo Arco-Iris'}
-            </Text>
-
-            <View style={styles.itensResumoRow}>
-              <View style={styles.itemBadge}>
-                <Image
-                  source={AssetsJogo.ITENS.LEITE_URSO}
-                  style={styles.iconeLeite}
-                  resizeMode="contain"
-                />
-                <Text style={[styles.itemBadgeTexto, { color: dadosTema.corTexto }]}>
-                  Leite de Urso (+1 pt)
-                </Text>
+          {isPaisagem ? (
+            <View style={styles.containerPaisagemRow}>
+              <View style={styles.colunaEsquerdaPaisagem}>
+                <View style={styles.headerPaisagemRow}>
+                  <Text style={styles.tituloPaisagem}>FLAPPY DCAT</Text>
+                  <View style={styles.badgeTopoPaisagem}>
+                    <Text style={styles.badgeTexto}>{Configuracoes.META.INSTITUICAO}</Text>
+                  </View>
+                </View>
+                {renderizarCardPreview()}
               </View>
-              <View style={styles.itemBadge}>
-                <Image
-                  source={AssetsJogo.ITENS.LEITE_COELHO}
-                  style={styles.iconeLeite}
-                  resizeMode="contain"
-                />
-                <Text style={[styles.itemBadgeTexto, { color: dadosTema.corTexto }]}>
-                  Leite de Coelho (3x / 10s)
-                </Text>
+
+              <View style={styles.colunaDireitaPaisagem}>
+                {renderizarControlesMenu()}
               </View>
             </View>
-          </TouchableOpacity>
+          ) : (
+            <>
+              <View style={styles.badgeTopo}>
+                <Text style={styles.badgeTexto}>{Configuracoes.META.INSTITUICAO}</Text>
+              </View>
 
-          <View style={[styles.seletorTemaContainer, isPaisagem && styles.larguraMaxPaisagem]}>
-            <Text style={styles.seletorLabel}>ESCOLHA O TEMA DO CENARIO:</Text>
-            <View style={styles.botoesTemaRow}>
-              <TouchableOpacity
-                style={[
-                  styles.botaoTema,
-                  temaAtual === 'DIA' && styles.botaoTemaAtivoDia,
-                ]}
-                onPress={() => alternarTema('DIA')}
-              >
-                <Text
-                  style={[
-                    styles.botaoTemaTexto,
-                    temaAtual === 'DIA' && styles.botaoTemaTextoAtivo,
-                  ]}
-                >
-                  TEMA DIA
-                </Text>
-              </TouchableOpacity>
+              <View style={styles.headerContainer}>
+                <Text style={styles.tituloSombra}>FLAPPY DCAT</Text>
+                <Text style={styles.titulo}>FLAPPY DCAT</Text>
+                <Text style={styles.subtitulo}>{dadosTema.subtitulo}</Text>
+              </View>
 
-              <TouchableOpacity
-                style={[
-                  styles.botaoTema,
-                  temaAtual === 'NOITE' && styles.botaoTemaAtivoNoite,
-                ]}
-                onPress={() => alternarTema('NOITE')}
-              >
-                <Text
-                  style={[
-                    styles.botaoTemaTexto,
-                    temaAtual === 'NOITE' && styles.botaoTemaTextoAtivoNoite,
-                  ]}
-                >
-                  TEMA NOITE
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={[styles.menuBotoes, isPaisagem && styles.larguraMaxPaisagem]}>
-            <TouchableOpacity
-              style={[styles.botaoPrincipal, { backgroundColor: dadosTema.corPrimaria }]}
-              onPress={() => navigation.navigate('TelaJogo', { temaEscolhido: temaAtual })}
-            >
-              <Text style={styles.botaoPrincipalTexto}>JOGAR AGORA</Text>
-            </TouchableOpacity>
-
-            <View style={styles.botoesSecundariosRow}>
-              <TouchableOpacity
-                style={styles.botaoSecundario}
-                onPress={() =>
-                  navigation.navigate('TelaInstrucoes', { temaEscolhido: temaAtual })
-                }
-              >
-                <Text style={styles.botaoSecundarioTexto}>INSTRUCOES</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.botaoSecundario}
-                onPress={() => setModalAudioVisivel(true)}
-              >
-                <Text style={styles.botaoSecundarioTexto}>
-                  {cfgAudio.mudoGeral ? 'AUDIO: OFF' : 'AUDIO'}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.botaoSecundario}
-                onPress={() =>
-                  navigation.navigate('TelaCreditos', { temaEscolhido: temaAtual })
-                }
-              >
-                <Text style={styles.botaoSecundarioTexto}>CREDITOS</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+              {renderizarCardPreview()}
+              {renderizarControlesMenu()}
+            </>
+          )}
         </ScrollView>
       </SafeAreaView>
 
-      <Modal
-        visible={modalAudioVisivel}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setModalAudioVisivel(false)}
-      >
-        <View style={styles.modalFundo}>
+      {modalAudioVisivel && (
+        <View style={styles.modalFundoAbsoluto}>
           <View style={[styles.modalCard, isPaisagem && styles.modalCardPaisagem]}>
             <View style={styles.modalHeaderRow}>
               <Text style={styles.modalTitulo}>CONFIGURACAO DE AUDIO</Text>
@@ -322,41 +364,40 @@ export default function TelaBoasVindas({ navigation, route }) {
               </TouchableOpacity>
             </View>
 
-            <ScrollView
-              style={styles.modalScrollArea}
-              showsVerticalScrollIndicator={false}
-            >
-              {renderizarLinhaControleAudio(
-                'GERAL',
-                'Controla ou muta todos os audios do jogo',
-                'volumeGeral',
-                'mudoGeral'
-              )}
+            {renderizarLinhaControleAudio(
+              'GERAL',
+              'Controla ou muta todos os audios do jogo',
+              'volumeGeral',
+              'mudoGeral'
+            )}
 
-              {renderizarLinhaControleAudio(
-                'MUSICAS',
-                'Controla ou muta apenas a trilha sonora',
-                'volumeMusica',
-                'mudoMusica'
-              )}
+            {renderizarLinhaControleAudio(
+              'MUSICAS',
+              'Controla ou muta apenas a trilha sonora',
+              'volumeMusica',
+              'mudoMusica'
+            )}
 
-              {renderizarLinhaControleAudio(
-                'EFEITOS',
-                'Controla ou muta apenas vozes e miado',
-                'volumeEfeitos',
-                'mudoEfeitos'
-              )}
-            </ScrollView>
+            {renderizarLinhaControleAudio(
+              'EFEITOS',
+              'Controla ou muta apenas vozes e miado',
+              'volumeEfeitos',
+              'mudoEfeitos'
+            )}
 
             <TouchableOpacity
-              style={[styles.botaoFecharModal, { backgroundColor: dadosTema.corPrimaria }]}
+              style={[
+                styles.botaoFecharModal,
+                isPaisagem && styles.botaoFecharModalPaisagem,
+                { backgroundColor: dadosTema.corPrimaria },
+              ]}
               onPress={() => setModalAudioVisivel(false)}
             >
               <Text style={styles.botaoFecharModalTexto}>FECHAR</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      )}
     </ImageBackground>
   );
 }
@@ -377,12 +418,37 @@ const styles = StyleSheet.create({
   overlay: {
     flexGrow: 1,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 16,
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   overlayPaisagem: {
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    justifyContent: 'center',
+  },
+  containerPaisagemRow: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  colunaEsquerdaPaisagem: {
+    width: '49%',
+    justifyContent: 'center',
+  },
+  colunaDireitaPaisagem: {
+    width: '48%',
+    justifyContent: 'center',
+  },
+  blocoDireitoMenu: {
+    width: '100%',
+  },
+  headerPaisagemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
   },
   badgeTopo: {
     backgroundColor: 'rgba(0, 0, 0, 0.65)',
@@ -393,11 +459,19 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.35)',
     marginBottom: 6,
   },
+  badgeTopoPaisagem: {
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+  },
   badgeTexto: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.8,
   },
   headerContainer: {
     alignItems: 'center',
@@ -421,7 +495,13 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   tituloPaisagem: {
-    fontSize: 30,
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#FFD166',
+    letterSpacing: 1.5,
+    textShadowColor: '#000000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
   },
   subtitulo: {
     marginTop: 4,
@@ -442,11 +522,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   previewCardPaisagem: {
-    maxWidth: 520,
-    padding: 10,
-  },
-  larguraMaxPaisagem: {
-    maxWidth: 520,
+    padding: 8,
+    marginBottom: 0,
   },
   gatoPreviewBox: {
     height: 85,
@@ -454,14 +531,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   gatoPreviewBoxPaisagem: {
-    height: 62,
+    height: 54,
   },
   dicaPreview: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     textAlign: 'center',
-    marginTop: 4,
-    marginBottom: 10,
+    marginTop: 2,
+    marginBottom: 6,
   },
   itensResumoRow: {
     flexDirection: 'row',
@@ -469,31 +546,31 @@ const styles = StyleSheet.create({
     width: '100%',
     borderTopWidth: 1,
     borderTopColor: 'rgba(150,150,150,0.3)',
-    paddingTop: 10,
+    paddingTop: 6,
   },
   itemBadge: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconeLeite: {
-    width: 26,
-    height: 34,
-    marginRight: 6,
+    width: 22,
+    height: 30,
+    marginRight: 5,
   },
   itemBadgeTexto: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
   },
   seletorTemaContainer: {
     width: '100%',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   seletorLabel: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '800',
-    marginBottom: 8,
+    marginBottom: 6,
     textShadowColor: '#000',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
@@ -505,13 +582,16 @@ const styles = StyleSheet.create({
   },
   botaoTema: {
     flex: 1,
-    marginHorizontal: 5,
+    marginHorizontal: 4,
     paddingVertical: 11,
     borderRadius: 12,
     backgroundColor: 'rgba(0, 0, 0, 0.55)',
     borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.35)',
     alignItems: 'center',
+  },
+  botaoTemaPaisagem: {
+    paddingVertical: 8,
   },
   botaoTemaAtivoDia: {
     backgroundColor: '#FFB703',
@@ -524,7 +604,7 @@ const styles = StyleSheet.create({
   botaoTemaTexto: {
     color: '#E0E0E0',
     fontWeight: '800',
-    fontSize: 13,
+    fontSize: 12.5,
   },
   botaoTemaTextoAtivo: {
     color: '#023047',
@@ -537,16 +617,20 @@ const styles = StyleSheet.create({
   },
   botaoPrincipal: {
     width: '100%',
-    paddingVertical: 15,
+    paddingVertical: 14,
     borderRadius: 14,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    marginBottom: 10,
+    marginBottom: 8,
+  },
+  botaoPrincipalPaisagem: {
+    paddingVertical: 11,
+    marginBottom: 6,
   },
   botaoPrincipalTexto: {
     color: '#023047',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '900',
     letterSpacing: 1,
   },
@@ -558,38 +642,44 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 3,
     backgroundColor: 'rgba(15, 23, 42, 0.85)',
-    paddingVertical: 12,
+    paddingVertical: 11,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: 'rgba(255,255,255,0.5)',
   },
+  botaoSecundarioPaisagem: {
+    paddingVertical: 9,
+  },
   botaoSecundarioTexto: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '800',
   },
-  modalFundo: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+  modalFundoAbsoluto: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.78)',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    zIndex: 200,
   },
   modalCard: {
     width: '100%',
     maxWidth: 380,
-    maxHeight: '90%',
     backgroundColor: '#0F172A',
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 18,
+    padding: 14,
     borderWidth: 2.5,
     borderColor: '#FFD166',
   },
   modalCardPaisagem: {
-    maxWidth: 480,
-    maxHeight: '94%',
+    maxWidth: 620,
     paddingVertical: 10,
     paddingHorizontal: 14,
   },
@@ -597,7 +687,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   modalTitulo: {
     color: '#FFD166',
@@ -609,7 +699,7 @@ const styles = StyleSheet.create({
   botaoFecharTopo: {
     backgroundColor: '#E63946',
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 5,
     borderRadius: 8,
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
@@ -620,26 +710,39 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '900',
   },
-  modalScrollArea: {
-    flexGrow: 0,
-  },
   blocoAudio: {
     backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 8,
-    marginBottom: 8,
+    marginBottom: 7,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.14)',
+  },
+  blocoAudioPaisagem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginBottom: 6,
   },
   cabecalhoBlocoAudio: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
+  },
+  cabecalhoBlocoAudioPaisagem: {
+    width: 175,
+    marginBottom: 0,
+    marginRight: 10,
+  },
+  infoCanalAudio: {
+    flex: 1,
   },
   tituloBlocoAudio: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '900',
   },
   subtituloBlocoAudio: {
@@ -648,10 +751,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   botaoMudo: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    minWidth: 74,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 7,
+    minWidth: 68,
     alignItems: 'center',
   },
   botaoMudoAtivo: {
@@ -662,7 +765,7 @@ const styles = StyleSheet.create({
   },
   botaoMudoTexto: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '900',
   },
   controlesVolumeRow: {
@@ -670,17 +773,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  controlesVolumeRowPaisagem: {
+    flex: 1,
+  },
   botaoAjusteVolume: {
-    width: 32,
-    height: 30,
-    borderRadius: 8,
+    width: 30,
+    height: 28,
+    borderRadius: 7,
     backgroundColor: 'rgba(255, 255, 255, 0.16)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   botaoAjusteVolumeTexto: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '900',
   },
   barraSegmentosContainer: {
@@ -688,14 +794,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 8,
-    height: 20,
+    height: 18,
     alignItems: 'center',
   },
   segmentoVolume: {
     flex: 1,
-    height: 16,
+    height: 14,
     marginHorizontal: 2,
-    borderRadius: 4,
+    borderRadius: 3,
   },
   segmentoVolumeAtivo: {
     backgroundColor: '#FFB703',
@@ -704,16 +810,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.18)',
   },
   botaoFecharModal: {
-    marginTop: 4,
-    paddingVertical: 12,
-    borderRadius: 12,
+    marginTop: 2,
+    paddingVertical: 10,
+    borderRadius: 10,
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
   },
+  botaoFecharModalPaisagem: {
+    paddingVertical: 7,
+  },
   botaoFecharModalTexto: {
     color: '#023047',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '900',
     letterSpacing: 0.8,
   },
